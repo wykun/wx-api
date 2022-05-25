@@ -1,18 +1,18 @@
 package com.github.niefy.modules.wx.manage;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import me.chanjar.weixin.mp.api.WxMpService;
+import com.github.niefy.common.utils.PageUtils;
+import com.github.niefy.common.utils.R;
+import com.github.niefy.modules.wx.entity.WxUser;
+import com.github.niefy.modules.wx.service.WxUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.github.niefy.modules.wx.entity.WxUser;
-import com.github.niefy.modules.wx.service.WxUserService;
-import com.github.niefy.common.utils.PageUtils;
-import com.github.niefy.common.utils.R;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -24,17 +24,17 @@ import com.github.niefy.common.utils.R;
  */
 @RestController
 @RequestMapping("/manage/wxUser")
+@Api(tags = {"公众号粉丝-管理后台"})
 public class WxUserManageController {
     @Autowired
     private WxUserService userService;
-    @Autowired
-    private WxMpService wxMpService;
 
     /**
      * 列表
      */
     @GetMapping("/list")
     @RequiresPermissions("wx:wxuser:list")
+    @ApiOperation(value = "列表")
     public R list(@CookieValue String appid,@RequestParam Map<String, Object> params) {
         params.put("appid",appid);
         PageUtils page = new PageUtils(userService.queryPage(params));
@@ -47,6 +47,7 @@ public class WxUserManageController {
      */
     @PostMapping("/listByIds")
     @RequiresPermissions("wx:wxuser:list")
+    @ApiOperation(value = "列表-ID查询")
     public R listByIds(@CookieValue String appid,@RequestBody String[] openids){
         List<WxUser> users = userService.listByIds(Arrays.asList(openids));
         return R.ok().put(users);
@@ -58,6 +59,7 @@ public class WxUserManageController {
      */
     @GetMapping("/info/{openid}")
     @RequiresPermissions("wx:wxuser:info")
+    @ApiOperation(value = "详情")
     public R info(@CookieValue String appid,@PathVariable("openid") String openid) {
         WxUser wxUser = userService.getById(openid);
 
@@ -69,8 +71,8 @@ public class WxUserManageController {
      */
     @PostMapping("/syncWxUsers")
     @RequiresPermissions("wx:wxuser:save")
+    @ApiOperation(value = "同步用户列表到数据库")
     public R syncWxUsers(@CookieValue String appid) {
-        wxMpService.switchoverTo(appid);
         userService.syncWxUsers(appid);
 
         return R.ok("任务已建立");
@@ -83,6 +85,7 @@ public class WxUserManageController {
      */
     @PostMapping("/delete")
     @RequiresPermissions("wx:wxuser:delete")
+    @ApiOperation(value = "删除")
     public R delete(@CookieValue String appid,@RequestBody String[] ids) {
         userService.removeByIds(Arrays.asList(ids));
 

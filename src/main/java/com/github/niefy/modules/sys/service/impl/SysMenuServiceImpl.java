@@ -2,10 +2,9 @@ package com.github.niefy.modules.sys.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.niefy.common.utils.Constant;
 import com.github.niefy.common.utils.MapUtils;
 import com.github.niefy.modules.sys.dao.SysMenuDao;
-import com.github.niefy.modules.sys.service.SysUserService;
-import com.github.niefy.common.utils.Constant;
 import com.github.niefy.modules.sys.entity.SysMenuEntity;
 import com.github.niefy.modules.sys.service.SysMenuService;
 import com.github.niefy.modules.sys.service.SysRoleMenuService;
@@ -18,8 +17,6 @@ import java.util.List;
 
 @Service("sysMenuService")
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> implements SysMenuService {
-    @Autowired
-    private SysUserService sysUserService;
     @Autowired
     private SysRoleMenuService sysRoleMenuService;
 
@@ -57,7 +54,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
         }
 
         //用户菜单列表
-        List<Long> menuIdList = sysUserService.queryAllMenuId(userId);
+        List<Long> menuIdList = sysRoleMenuService.queryAllMenuId(userId);
         return getAllMenuList(menuIdList);
     }
 
@@ -67,6 +64,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
         this.removeById(menuId);
         //删除菜单与角色关联
         sysRoleMenuService.removeByMap(new MapUtils().put("menu_id", menuId));
+    }
+
+    @Override
+    public List<SysMenuEntity> queryUserAllMenu(Long userId) {
+        return baseMapper.queryUserAllMenu(userId);
     }
 
     /**
